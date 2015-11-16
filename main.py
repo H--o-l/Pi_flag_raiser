@@ -9,6 +9,7 @@ import time
 HOSTNAME = 'imap.gmail.com'
 MAILBOX = 'Inbox'
 MAIL_CHECK_FREQ = 60 # check mail every 60 seconds
+INIT_WAIT = 10 # Waiting time after start up
 
 def inputHelp():
   print 'main.py -id <identification> -p <password> --debug'
@@ -22,26 +23,32 @@ def main(argv):
 
   # Get identification and password from command line argument
   try:
-    opts, args = getopt.getopt(argv,"hi:p:d",["identification=","password=","debug"])
+    opts, args = getopt.getopt(argv,'hi:p:d',['identification=','password=','debug'])
   except getopt.GetoptError:
     inputHelp()
   for opt, arg in opts:
     if opt == '-h':
       inputHelp()
-    elif opt in ("-i", "--identification"):
+    elif opt in ('-i', '--identification'):
       identification = arg
-    elif opt in ("-p", "--password"):
+    elif opt in ('-p', '--password'):
       password = arg
-    elif opt in ("-d", "--debug"):
+    elif opt in ('-d', '--debug'):
       debug = True
     else:
-      print opt + " unknown option."
+      print opt + ' unknown option.'
       inputHelp()
   if identification == '' or password == '':
     inputHelp()
 
+  print '#--- Start\nId is: ' + identification
   if debug:
-    print('Id: ' + identification)
+    if INIT_WAIT != 0:
+      print 'Waiting ' + str(INIT_WAIT) + 's before first connexion'
+
+  # flush stdout for debug and sleep
+  sys.stdout.flush()
+  time.sleep(INIT_WAIT)
 
   try:
     # IO setup
@@ -63,7 +70,7 @@ def main(argv):
       newmails = int(folder_status['UNSEEN'])
      
       if debug:
-        print "You have", newmails, "new emails."
+        print 'You have', newmails, 'new emails'
     
       # IO update
       # if newmails > 0:
@@ -74,13 +81,14 @@ def main(argv):
       #   GPIO.output(RED_LED, True)
 
       # Logout
-      server.logout()
+      #server.logout()
 
-      # sleep
+      # flush stdout for debug and sleep
+      sys.stdout.flush()
       time.sleep(MAIL_CHECK_FREQ)
 
   finally:
-    pass
+    print '#--- Stop'
     # GPIO.cleanup()
 
 if __name__ == '__main__':

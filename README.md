@@ -9,8 +9,19 @@ sudo pip install imapclient
 ```
 
 # Use
+To start:
 ```
-python main.py -h
+python main.py -id <identification> -p <password> --debug
+```
+For starting script just after network connexion, you can edit /etc/network/interfaces and add the following line with right path and ids:
+```
+post-up python /home/user/git_rep_directory/main.py -i identification -p password > /home/user/git_rep_directory/Log 2>&1 &
+```
+Last part will create a Log file in your git repository.
+
+You can restart network interface with:
+```
+sudo /etc/init.d/networking restart
 ```
 
 # Links
