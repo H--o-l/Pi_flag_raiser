@@ -7,6 +7,13 @@ Install python imap client:
 sudo apt-get install -y python-pip
 sudo pip install imapclient
 ```
+Install RPIO python lib for raspberry:
+```
+sudo apt-get install -y python2.7-dev
+git clone https://github.com/metachris/RPIO.git
+cd RPIO
+sudo python setup.py install
+```
 
 # Use
 To start:
@@ -30,4 +37,4 @@ Based on:
 
 Documentation:
 [Imap client documentation](https://imapclient.readthedocs.org/en/stable/)
-
+[RPIO lib documentation](https://github.com/metachris/RPIO)

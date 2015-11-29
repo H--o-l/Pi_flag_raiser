@@ -1,20 +1,31 @@
 #!/usr/bin/env python
- 
+
 from imapclient import IMAPClient
 import sys, getopt
 import time
- 
-# import RPi.GPIO as GPIO
- 
+from RPIO import PWM
+
+# Init servo
+servo = PWM.Servo()
+
 HOSTNAME = 'imap.gmail.com'
 MAILBOX = 'Inbox'
-MAIL_CHECK_FREQ = 60 # check mail every 60 seconds
-INIT_WAIT = 10 # Waiting time after start up
+MAIL_CHECK_FREQ = 20 # check mail every 60 seconds
+INIT_WAIT       = 10 # 10s Waiting time after start up
+SERVO_LATENCY   = 1 # 1s
 
 def inputHelp():
   print 'main.py -id <identification> -p <password> --debug'
   print 'Manage your google application passwords at https://security.google.com/settings/security/apppasswords'
   sys.exit()
+
+def raiseFlag():
+  servo.set_servo(14, 2000)
+
+def lowerFlag():
+  servo.set_servo(14, 1250)
+  time.sleep(SERVO_LATENCY)
+  servo.stop_servo(14)
 
 def main(argv):
   debug = False
@@ -46,50 +57,41 @@ def main(argv):
     if INIT_WAIT != 0:
       print 'Waiting ' + str(INIT_WAIT) + 's before first connexion'
 
-  # flush stdout for debug and sleep
+  # Init servo
+  servo = PWM.Servo()
+
+  # Flush stdout for debug and sleep
   sys.stdout.flush()
   time.sleep(INIT_WAIT)
 
   try:
-    # IO setup
-    # GPIO.setwarnings(False)
-    # GPIO.setmode(GPIO.BCM)
-    # GREEN_LED = 18
-    # RED_LED = 23
-    # GPIO.setup(GREEN_LED, GPIO.OUT)
-    # GPIO.setup(RED_LED, GPIO.OUT)
-
     # Loop
     while True:
       # New server and log in server (imap forbid server reopen)
       server = IMAPClient(HOSTNAME, use_uid=True, ssl=True)
       server.login(identification, password)
-     
+
       # Unseen mail
       folder_status = server.folder_status(MAILBOX, 'UNSEEN')
       newmails = int(folder_status['UNSEEN'])
-     
+
       if debug:
         print 'You have', newmails, 'new emails'
-    
+
       # IO update
-      # if newmails > 0:
-      #   GPIO.output(GREEN_LED, True)
-      #   GPIO.output(RED_LED, False)
-      # else:
-      #   GPIO.output(GREEN_LED, False)
-      #   GPIO.output(RED_LED, True)
+      if newmails > 0:
+        raiseFlag()
+      else:
+        lowerFlag()
 
-      # Logout
-      #server.logout()
-
-      # flush stdout for debug and sleep
+      # Flush stdout for debug and sleep
       sys.stdout.flush()
       time.sleep(MAIL_CHECK_FREQ)
 
   finally:
     print '#--- Stop'
-    # GPIO.cleanup()
+    lowerFlag()
+    time.sleep(SERVO_LATENCY)
 
 if __name__ == '__main__':
   main(sys.argv[1:])
