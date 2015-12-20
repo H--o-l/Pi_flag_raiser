@@ -32,6 +32,8 @@ def main(argv):
   debug = False
   identification = ''
   password = ''
+  new_mails_count = -1
+  previous_new_mails_count = -1
 
   # Get identification and password from command line argument
   try:
@@ -74,17 +76,19 @@ def main(argv):
 
       # Unseen mail
       folder_status = server.folder_status(MAILBOX, 'UNSEEN')
-      newmails = int(folder_status['UNSEEN'])
+      previous_new_mails_count = new_mails_count
+      new_mails_count = int(folder_status['UNSEEN'])
       server.logout()
 
       if debug:
-        print 'You have', newmails, 'new emails'
+        print 'You have', new_mails_count, 'new emails'
 
       # IO update
-      if newmails > 0:
-        raiseFlag()
-      else:
-        lowerFlag()
+      if previous_new_mails_count != new_mails_count:
+        if new_mails_count > 0:
+          raiseFlag()
+        else:
+          lowerFlag()
 
       # Flush stdout for debug and sleep
       sys.stdout.flush()
