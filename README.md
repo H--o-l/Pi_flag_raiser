@@ -7,6 +7,12 @@ Install python imap client:
 sudo apt-get install -y python-pip
 sudo pip install imapclient
 ```
+Nb : Recently I wasn't able to use imapclient 1.0.0 anymore (pb similar to [issue](https://bitbucket.org/mjs0/imapclient/issues/196/attributeerror-module-object-has-no)).
+I had to use imapclient 0.13:
+```
+sudo pip install imapclient==0.13
+```
+
 Install RPIO python lib for raspberry:
 ```
 sudo apt-get install -y python2.7-dev

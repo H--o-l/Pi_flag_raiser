@@ -20,12 +20,12 @@ def inputHelp():
   sys.exit()
 
 def raiseFlag():
-  servo.set_servo(14, 2000)
+  servo.set_servo(18, 2000)
 
 def lowerFlag():
-  servo.set_servo(14, 1250)
+  servo.set_servo(18, 1250)
   time.sleep(SERVO_LATENCY)
-  servo.stop_servo(14)
+  servo.stop_servo(18)
 
 def main(argv):
   debug = False
@@ -74,6 +74,7 @@ def main(argv):
       # Unseen mail
       folder_status = server.folder_status(MAILBOX, 'UNSEEN')
       newmails = int(folder_status['UNSEEN'])
+      server.logout()
 
       if debug:
         print 'You have', newmails, 'new emails'
