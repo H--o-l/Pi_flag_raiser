@@ -20,10 +20,11 @@ def inputHelp():
   sys.exit()
 
 def raiseFlag():
-  servo.set_servo(18, 2000)
+  servo.set_servo(18, 1900)
+  time.sleep(SERVO_LATENCY)
 
 def lowerFlag():
-  servo.set_servo(18, 1250)
+  servo.set_servo(18, 1000)
   time.sleep(SERVO_LATENCY)
   servo.stop_servo(18)
 
