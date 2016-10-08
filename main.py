@@ -13,11 +13,12 @@ MAILBOX = 'Inbox'
 MAIL_CHECK_FREQ     = 20 # check mail every 60 seconds
 INIT_WAIT           = 10 # 10s Waiting time after start up
 SERVO_LATENCY       = 1 # 1s
-SERVO_STEP_COUNT    = 30
-SERVO_TIME_BETWEEN  = 0.1
+SERVO_TIME_BETWEEN  = 0.01
 SERVO_UP_VALUE      = 1200
-SERVO_DOWN_VALUE    = 800
-SERVO_STEP_VALUE    = (SERVO_UP_VALUE - SERVO_DOWN_VALUE) / SERVO_STEP_COUNT
+SERVO_DOWN_VALUE    = 660
+SERVO_STEP_VALUE    = 10
+
+flag_state = "down"
 
 def inputHelp():
   print 'main.py -id <identification> -p <password> --debug'
@@ -25,18 +26,26 @@ def inputHelp():
   sys.exit()
 
 def raiseFlag():
-  for i in my_range(SERVO_DOWN_VALUE, SERVO_UP_VALUE, SERVO_STEP_VALUE):
-    servo.set_servo(18, i)
-    time.sleep(SERVO_TIME_BETWEEN)
+  global flag_state
+  if flag_state == "down":
+    for i in range(SERVO_DOWN_VALUE, SERVO_UP_VALUE, SERVO_STEP_VALUE):
+      servo.set_servo(18, i)
+      time.sleep(SERVO_TIME_BETWEEN)
   servo.set_servo(18, SERVO_UP_VALUE)
-    
+  time.sleep(SERVO_LATENCY)
+  flag_state = "up"  
 
 def lowerFlag():
-  for i in my_range(SERVO_UP_VALUE, SERVO_DOWN_VALUE, SERVO_STEP_VALUE):
-    servo.set_servo(18, i)
-    time.sleep(SERVO_TIME_BETWEEN)
-  servo.set_servo(18, SERVO_DOWN_VALUE)
-  servo.stop_servo(18)
+  global flag_state
+  if flag_state == "up":
+    for i in range(SERVO_UP_VALUE, SERVO_DOWN_VALUE, -SERVO_STEP_VALUE):
+      servo.set_servo(18, i)
+      time.sleep(SERVO_TIME_BETWEEN)
+    servo.set_servo(18, SERVO_DOWN_VALUE)
+    servo.stop_servo(18)
+    time.sleep(SERVO_LATENCY)
+    flag_state = "down"
+
 
 def main(argv):
   debug = False
