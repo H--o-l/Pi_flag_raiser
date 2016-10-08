@@ -10,9 +10,14 @@ servo = PWM.Servo()
 
 HOSTNAME = 'imap.gmail.com'
 MAILBOX = 'Inbox'
-MAIL_CHECK_FREQ = 20 # check mail every 60 seconds
-INIT_WAIT       = 10 # 10s Waiting time after start up
-SERVO_LATENCY   = 1 # 1s
+MAIL_CHECK_FREQ     = 20 # check mail every 60 seconds
+INIT_WAIT           = 10 # 10s Waiting time after start up
+SERVO_LATENCY       = 1 # 1s
+SERVO_STEP_COUNT    = 30
+SERVO_TIME_BETWEEN  = 0.1
+SERVO_UP_VALUE      = 1200
+SERVO_DOWN_VALUE    = 800
+SERVO_STEP_VALUE    = (SERVO_UP_VALUE - SERVO_DOWN_VALUE) / SERVO_STEP_COUNT
 
 def inputHelp():
   print 'main.py -id <identification> -p <password> --debug'
@@ -20,12 +25,17 @@ def inputHelp():
   sys.exit()
 
 def raiseFlag():
-  servo.set_servo(18, 1900)
-  time.sleep(SERVO_LATENCY)
+  for i in my_range(SERVO_DOWN_VALUE, SERVO_UP_VALUE, SERVO_STEP_VALUE):
+    servo.set_servo(18, i)
+    time.sleep(SERVO_TIME_BETWEEN)
+  servo.set_servo(18, SERVO_UP_VALUE)
+    
 
 def lowerFlag():
-  servo.set_servo(18, 1000)
-  time.sleep(SERVO_LATENCY)
+  for i in my_range(SERVO_UP_VALUE, SERVO_DOWN_VALUE, SERVO_STEP_VALUE):
+    servo.set_servo(18, i)
+    time.sleep(SERVO_TIME_BETWEEN)
+  servo.set_servo(18, SERVO_DOWN_VALUE)
   servo.stop_servo(18)
 
 def main(argv):
@@ -63,6 +73,10 @@ def main(argv):
   # Init servo
   servo = PWM.Servo()
 
+  # Test servo
+  raiseFlag()
+  lowerFlag()
+  
   # Flush stdout for debug and sleep
   sys.stdout.flush()
   time.sleep(INIT_WAIT)
